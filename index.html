@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>World Cup 2026 Predictor – Ozdome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
+
+    <style>
+      body {
+        background: radial-gradient(circle at top, #0f172a, #020617 55%);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen text-slate-100">
+    <div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <!-- HEADER -->
+      <header class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-300 font-bold">
+            WC
+          </div>
+          <div>
+            <h1 class="text-xl font-semibold tracking-tight">
+              World Cup 2026 Predictor
+            </h1>
+            <p class="text-xs text-slate-400">
+              Created by <span class="font-medium">Jagpreet</span>
+            </p>
+          </div>
+        </div>
+
+        <nav class="flex gap-4 text-sm text-slate-300">
+          <button id="nav-dashboard" class="hover:text-emerald-300">Dashboard</button>
+          <button id="nav-leaderboard" class="hover:text-emerald-300">Leaderboard</button>
+          <button id="nav-admin" class="hover:text-emerald-300">Admin</button>
+          <button id="btn-logout" class="text-xs px-3 py-1 rounded-full border border-slate-600 hover:border-emerald-400 hover:text-emerald-300">
+            Logout
+          </button>
+        </nav>
+      </header>
+
+      <!-- AUTH -->
+      <section id="auth-section" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-4">
+        <h2 class="text-sm font-semibold">Login</h2>
+
+        <div class="grid gap-3 max-w-sm">
+          <input id="email" type="email" placeholder="Email" class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm" />
+          <input id="password" type="password" placeholder="Password" class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm" />
+
+          <div class="flex gap-2">
+            <button id="btn-login" class="flex-1 text-sm px-3 py-2 rounded-lg bg-emerald-500 text-slate-900 font-medium hover:bg-emerald-400">Login</button>
+            <button id="btn-signup" class="flex-1 text-sm px-3 py-2 rounded-lg bg-slate-800 text-slate-100 hover:bg-slate-700">Sign up</button>
+          </div>
+        </div>
+
+        <!-- PASSCODE -->
+        <div id="passcode-section" class="hidden pt-4 border-t border-slate-800">
+          <p class="text-xs text-slate-400 mb-2">Enter league passcode:</p>
+
+          <div class="flex gap-2 max-w-xs">
+            <input id="passcode" type="password" placeholder="League passcode" class="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm" />
+            <button id="btn-join-passcode" class="text-sm px-3 py-2 rounded-lg bg-emerald-500 text-slate-900 font-medium hover:bg-emerald-400">Join</button>
+          </div>
+        </div>
+
+        <p id="auth-message" class="text-xs text-rose-400 mt-2"></p>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard-section" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold">World Cup 2026 Matches</h2>
+          <p id="user-label" class="text-xs text-slate-400"></p>
+        </div>
+
+        <div id="matches-list" class="grid gap-3 md:grid-cols-2"></div>
+
+        <!-- AI INSIGHT -->
+        <div id="insight-panel" class="hidden rounded-2xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 via-slate-900 to-slate-950 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-xs uppercase tracking-[0.2em] text-emerald-300">AI Match Insight</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900/80 border border-emerald-500/40 text-emerald-200">
+              Powered by Groq · LLaMA‑3
+            </span>
+          </div>
+          <p id="insight-text" class="text-sm text-slate-100 min-h-[60px]">Select a match to view insight.</p>
+        </div>
+      </section>
+
+      <!-- LEADERBOARD -->
+      <section id="leaderboard-section" class="hidden rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+        <h2 class="text-sm font-semibold mb-3">Leaderboard</h2>
+        <div id="leaderboard-list" class="space-y-1"></div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="admin-section" class="hidden rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-3">
+        <h2 class="text-sm font-semibold">Admin</h2>
+        <p class="text-xs text-slate-400">You are admin. Manage World Cup 2026 sync.</p>
+
+        <button id="btn-sync-matches" class="text-xs px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600">
+          Sync World Cup Matches
+        </button>
+
+        <p id="admin-message" class="text-xs text-emerald-300"></p>
+      </section>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+      const SUPABASE_URL = "https://osrnpjckkrwbsvekoqxw.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_uJcuAH0s9c2gKPKaQJyOsg_sFHFcNgf";
+
+      const AI_INSIGHT_FUNCTION_URL = SUPABASE_URL + "/functions/v1/ai_insight";
+      const SYNC_MATCHES_FUNCTION_URL = SUPABASE_URL + "/functions/v1/sync_matches";
+
+      const { createClient } = window.supabase;
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      let currentUser = null;
+      let currentMatches = [];
+
+      function show(sectionId) {
+        document.querySelectorAll("#dashboard-section,#leaderboard-section,#admin-section")
+          .forEach((el) => el.classList.add("hidden"));
+        document.getElementById(sectionId).classList.remove("hidden");
+      }
+
+      function setAuthVisible(v) {
+        document.getElementById("auth-section").classList.toggle("hidden", !v);
+      }
+
+      function setPasscodeVisible(v) {
+        document.getElementById("passcode-section").classList.toggle("hidden", !v);
+      }
+
+      function setInsight(text) {
+        document.getElementById("insight-panel").classList.remove("hidden");
+        document.getElementById("insight-text").textContent = text;
+      }
+
+      function isLocked(kickoffTime) {
+        const kickoff = new Date(kickoffTime).getTime();
+        return Date.now() >= kickoff - 15 * 60 * 1000;
+      }
+
+      async function refreshUser() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          currentUser = null;
+          setAuthVisible(true);
+          return;
+        }
+
+        currentUser = session.user;
+        setAuthVisible(false);
+
+        const { data: profile } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", currentUser.id)
+          .maybeSingle();
+
+        if (!profile) {
+          await supabase.from("users").insert({
+            id: currentUser.id,
+            name: currentUser.email.split("@")[0],
+          });
+          setPasscodeVisible(true);
+          return;
+        }
+
+        if (!profile.joined_with_passcode) {
+          setPasscodeVisible(true);
+          return;
+        }
+
+        setPasscodeVisible(false);
+
+        loadDashboard();
+        loadLeaderboard();
+
+        if (profile.is_admin) {
+          document.getElementById("admin-section").classList.remove("hidden");
+        }
+      }
+
+      document.getElementById("btn-login").onclick = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        document.getElementById("auth-message").textContent = error ? error.message : "";
+        if (!error) refreshUser();
+      };
+
+      document.getElementById("btn-signup").onclick = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const { error } = await supabase.auth.signUp({ email, password });
+        document.getElementById("auth-message").textContent =
+          error ? error.message : "Check your email to confirm.";
+      };
+
+      document.getElementById("btn-logout").onclick = async () => {
+        await supabase.auth.signOut();
+        location.reload();
+      };
+
+      document.getElementById("btn-join-passcode").onclick = async () => {
+        const pass = document.getElementById("passcode").value;
+
+        const { data: settings } = await supabase
+          .from("office_settings")
+          .select("*")
+          .eq("id", 1)
+          .maybeSingle();
+
+        if (pass === settings.join_passcode) {
+          await supabase
+            .from("users")
+            .update({ joined_with_passcode: true })
+            .eq("id", currentUser.id);
+
+          document.getElementById("auth-message").textContent = "Joined successfully.";
+          setPasscodeVisible(false);
+          loadDashboard();
+        } else {
+          document.getElementById("auth-message").textContent = "Incorrect passcode.";
+        }
+      };
+
+      async function loadDashboard() {
+        const { data: matches } = await supabase
+          .from("matches")
+          .select("*")
+          .order("kickoff_time", { ascending: true });
+
+        currentMatches = matches || [];
+        renderMatches();
+      }
+
+      function renderMatches() {
+        const container = document.getElementById("matches-list");
+        container.innerHTML = "";
+
+        currentMatches.forEach((m) => {
+          const locked = isLocked(m.kickoff_time);
+          const kickoff = new Date(m.kickoff_time).toLocaleString();
+
+          const card = document.createElement("div");
+          card.className =
+            "rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg shadow-emerald-500/5 flex flex-col gap-3";
+
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">World Cup Match</p>
+                <p class="text-sm font-semibold">${m.home_team} <span class="text-slate-500">vs</span> ${m.away_team}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-slate-400">Kickoff</p>
+                <p class="text-xs font-medium text-emerald-300">${kickoff}</p>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button data-pred="home" class="flex-1 rounded-xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-sm ${
+                locked ? "opacity-40 cursor-not-allowed" : "hover:border-emerald-400/60"
+              }">
+                <p class="text-xs text-slate-400">Home win</p>
+                <p class="text-sm font-semibold">${m.home_team}</p>
+              </button>
+
+              <button data-pred="draw" class="flex-1 rounded-xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-sm ${
+                locked ? "opacity-40 cursor-not-allowed" : "hover:border-emerald-400/60"
+              }">
+                <p class="text-xs text-slate-400">Draw</p>
+                <p class="text-sm font-semibold">Draw</p>
+              </button>
+
+              <button data-pred="away" class="flex-1 rounded-xl border border-slate-700/60 bg-slate-900/60 px-4 py-3 text-sm ${
+                locked ? "opacity-40 cursor-not-allowed" : "hover:border-emerald-400/60"
+              }">
+                <p class="text-xs text-slate-400">Away win</p>
+                <p class="text-sm font-semibold">${m.away_team}</p>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span class="${locked ? "text-rose-400" : "text-emerald-300"}">
+                ${locked ? "🔒 Predictions closed" : "✅ Predictions open"}
+              </span>
+              <span>Status: ${m.status.toUpperCase()}</span>
+            </div>
+
+            <button class="mt-1 text-[11px] text-emerald-300 hover:text-emerald-200 underline" data-insight="1">
+              View AI insight
+            </button>
+          `;
+
+          card.querySelectorAll("button[data-pred]").forEach((btn) => {
+            btn.onclick = async () => {
+              if (locked) return;
+              const pred = btn.getAttribute("data-pred");
+
+              await supabase.from("predictions").upsert({
+                user_id: currentUser.id,
+                match_id: m.id,
+                prediction: pred,
+              });
+
+              alert("Prediction saved.");
+            };
+          });
+
+          card.querySelector("button[data-insight]").onclick = () => {
+            loadInsightForMatch(m);
+          };
+
+          container.appendChild(card);
+        });
+      }
+
+      async function loadInsightForMatch(match) {
+        const { data: cached } = await supabase
+          .from("match_insights")
+          .select("*")
+          .eq("match_id", match.id)
+          .maybeSingle();
+
+        if (cached) {
+          setInsight(cached.insight_text);
+          return;
+        }
+
+        setInsight("Generating AI insight…");
+
+        const res = await fetch(AI_INSIGHT_FUNCTION_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            home_team: match.home_team,
+            away_team: match.away_team,
+            match_id: match.id,
+          }),
+        });
+
+        const json = await res.json();
+        setInsight(json.insight || "No insight available.");
+      }
+
+      async function loadLeaderboard() {
+        const { data } = await supabase.from("leaderboard").select("*");
+        const rows = data || [];
+
+        const container = document.getElementById("leaderboard-list");
+        container.innerHTML = "";
+
+        rows.forEach((row, idx) => {
+          const isMe = currentUser && row.user_id === currentUser.id;
+
+          const div = document.createElement("div");
+          div.className =
+            "flex items-center justify-between rounded-xl px-3 py-2 text-sm " +
+            (isMe
+              ? "bg-emerald-500/10 border border-emerald-400/60"
+              : "bg-slate-900/60 border border-slate-800");
+
+          div.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="w-6 text-xs text-slate-400">#${idx + 1}</span>
+              <span class="${isMe ? "font-semibold text-emerald-200" : ""}">
+                ${row.name || "Anonymous"}
+              </span>
+            </div>
+            <div class="text-xs text-slate-300">${row.points} pts</div>
+          `;
+
+          container.appendChild(div);
+        });
+      }
+
+      document.getElementById("btn-sync-matches").onclick = async () => {
+        const res = await fetch(SYNC_MATCHES_FUNCTION_URL, { method: "POST" });
+        document.getElementById("admin-message").textContent =
+          res.ok ? "World Cup sync triggered." : "Sync failed.";
+        loadDashboard();
+      };
+
+      document.getElementById("nav-dashboard").onclick = () => show("dashboard-section");
+      document.getElementById("nav-leaderboard").onclick = () => {
+        show("leaderboard-section");
+        loadLeaderboard();
+      };
+      document.get
