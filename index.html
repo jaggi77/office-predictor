@@ -17,7 +17,7 @@
 </head>
 
 <body class="bg-slate-950 text-slate-100 min-h-screen">
-  <div id="app-root" class="max-w-5xl mx-auto px-4 py-6">
+  <div id="app-root" class="max-w-6xl mx-auto px-4 py-6">
     <h1 class="text-xl font-bold text-center">Loading app…</h1>
   </div>
 
@@ -32,83 +32,125 @@
       const root = document.getElementById("app-root");
 
       root.innerHTML = `
-        <div class="space-y-6">
-          <header class="flex items-center justify-between">
-            <div>
-              <h1 class="text-2xl font-bold">Office World Cup 2026 Predictor</h1>
-              <p class="text-sm text-slate-400">Powered by Supabase</p>
+        <div class="space-y-8">
+          <!-- HEADER -->
+          <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="space-y-1">
+              <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                Office World Cup 2026 Predictor
+              </h1>
+              <p class="text-sm text-slate-400">
+                Friendly competition, live scores, and bragging rights — all powered by Supabase.
+              </p>
             </div>
-            <div id="auth-status" class="text-right text-sm text-slate-300">
-              Not signed in
+            <div class="flex flex-col items-end gap-1">
+              <div id="auth-status" class="text-sm text-slate-200">
+                Not signed in
+              </div>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-900/70 border border-slate-700 px-3 py-1 text-[11px] uppercase tracking-wide text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Live Office Pool
+              </span>
             </div>
           </header>
 
-          <!-- Auth section -->
+          <!-- AUTH SECTION -->
           <section id="auth-section" class="grid md:grid-cols-2 gap-6">
             <!-- Sign up -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
-              <h2 class="font-semibold text-lg">Sign up</h2>
-              <input id="signup-name" type="text" placeholder="Your name"
-                     class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
-              <input id="signup-email" type="email" placeholder="Email"
-                     class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
-              <input id="signup-password" type="password" placeholder="Password"
-                     class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
+            <div class="bg-gradient-to-br from-slate-900/80 to-slate-950/90 border border-slate-800/80 rounded-2xl p-5 shadow-lg shadow-emerald-500/5 space-y-3">
+              <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-lg">Create your account</h2>
+                <span class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">
+                  New player
+                </span>
+              </div>
+              <p class="text-xs text-slate-400">
+                Sign up once, then join your office pool with the shared passcode.
+              </p>
+              <div class="space-y-2">
+                <input id="signup-name" type="text" placeholder="Your name"
+                       class="w-full px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-400" />
+                <input id="signup-email" type="email" placeholder="Work email"
+                       class="w-full px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-400" />
+                <input id="signup-password" type="password" placeholder="Password"
+                       class="w-full px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/60 focus:border-emerald-400" />
+              </div>
               <button id="signup-btn"
-                      class="w-full py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-sm font-medium">
-                Create account
+                      class="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/30 transition">
+                Create account & sign in
               </button>
-              <p id="signup-message" class="text-xs text-slate-400"></p>
+              <p id="signup-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
             </div>
 
             <!-- Login -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
-              <h2 class="font-semibold text-lg">Log in</h2>
-              <input id="login-email" type="email" placeholder="Email"
-                     class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
-              <input id="login-password" type="password" placeholder="Password"
-                     class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
-              <button id="login-btn"
-                      class="w-full py-2 rounded bg-blue-600 hover:bg-blue-500 text-sm font-medium">
-                Log in
-              </button>
-              <button id="logout-btn"
-                      class="w-full py-2 rounded bg-slate-700 hover:bg-slate-600 text-sm font-medium hidden mt-1">
-                Log out
-              </button>
-              <p id="login-message" class="text-xs text-slate-400"></p>
+            <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-5 shadow-lg shadow-slate-900/60 space-y-3">
+              <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-lg">Welcome back</h2>
+                <span class="text-[10px] px-2 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-600">
+                  Existing player
+                </span>
+              </div>
+              <p class="text-xs text-slate-400">
+                Log in to update your predictions and see how you rank.
+              </p>
+              <div class="space-y-2">
+                <input id="login-email" type="email" placeholder="Email"
+                       class="w-full px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/60 focus:border-cyan-400" />
+                <input id="login-password" type="password" placeholder="Password"
+                       class="w-full px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/60 focus:border-cyan-400" />
+              </div>
+              <div class="space-y-2">
+                <button id="login-btn"
+                        class="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-sm font-semibold text-slate-950 shadow-md shadow-cyan-500/30 transition">
+                  Log in
+                </button>
+                <button id="logout-btn"
+                        class="w-full py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-slate-100 hidden">
+                  Log out
+                </button>
+              </div>
+              <p id="login-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
             </div>
           </section>
 
-          <!-- Passcode -->
-          <section id="passcode-section" class="hidden bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
-            <h2 class="font-semibold text-lg">Join your office pool</h2>
-            <p class="text-sm text-slate-400">
-              Enter the office passcode to join the World Cup 2026 predictor.
-            </p>
-            <input id="passcode-input" type="text" placeholder="Office passcode"
-                   class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
-            <button id="passcode-btn"
-                    class="px-4 py-2 rounded bg-amber-600 hover:bg-amber-500 text-sm font-medium">
-              Join with passcode
-            </button>
-            <p id="passcode-message" class="text-xs text-slate-400"></p>
+          <!-- PASSCODE -->
+          <section id="passcode-section" class="hidden bg-slate-950/90 border border-slate-800 rounded-2xl p-5 shadow-inner shadow-slate-900/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="font-semibold text-lg">Join your office pool</h2>
+                <p class="text-xs text-slate-400">
+                  Your organizer shared a passcode. Enter it once to unlock the game.
+                </p>
+              </div>
+              <span class="text-[10px] px-2 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/40">
+                Required
+              </span>
+            </div>
+            <div class="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
+              <input id="passcode-input" type="text" placeholder="Office passcode"
+                     class="flex-1 px-3 py-2 rounded-lg bg-slate-950/80 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-400 tracking-[0.2em] uppercase" />
+              <button id="passcode-btn"
+                      class="px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-sm font-semibold text-slate-950 shadow-md shadow-amber-500/30 transition">
+                Join with passcode
+              </button>
+            </div>
+            <p id="passcode-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
           </section>
 
-          <!-- Main app -->
+          <!-- MAIN APP -->
           <section id="app-section" class="hidden space-y-6">
             <!-- Tabs -->
-            <div class="flex gap-2 text-sm">
+            <div class="flex flex-wrap gap-2 text-sm">
               <button data-tab="matches"
-                      class="tab-btn px-3 py-1 rounded bg-slate-800 border border-slate-700">
+                      class="tab-btn px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-slate-50 shadow-sm shadow-slate-900/60">
                 Matches & Predictions
               </button>
               <button data-tab="leaderboard"
-                      class="tab-btn px-3 py-1 rounded bg-slate-900 border border-slate-800">
+                      class="tab-btn px-4 py-2 rounded-full bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 transition">
                 Leaderboard
               </button>
               <button data-tab="admin"
-                      class="tab-btn px-3 py-1 rounded bg-slate-900 border border-slate-800 hidden"
+                      class="tab-btn px-4 py-2 rounded-full bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 transition hidden"
                       id="admin-tab-btn">
                 Admin
               </button>
@@ -116,30 +158,45 @@
 
             <!-- Matches tab -->
             <div id="tab-matches" class="space-y-4">
-              <h2 class="font-semibold text-lg">World Cup 2026 Matches</h2>
-              <p class="text-xs text-slate-400">
-                Admin can insert sample matches; predictions are saved to Supabase.
-              </p>
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <h2 class="font-semibold text-lg flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  World Cup 2026 Matches
+                </h2>
+                <p class="text-[11px] text-slate-400">
+                  Click Home / Draw / Away to lock in your prediction.
+                </p>
+              </div>
               <div id="matches-list" class="space-y-3 text-sm"></div>
             </div>
 
             <!-- Leaderboard tab -->
             <div id="tab-leaderboard" class="hidden space-y-4">
-              <h2 class="font-semibold text-lg">Leaderboard</h2>
+              <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-lg">Leaderboard</h2>
+                <p class="text-[11px] text-slate-400">
+                  3 points for each correct result.
+                </p>
+              </div>
               <div id="leaderboard-list" class="space-y-2 text-sm"></div>
             </div>
 
             <!-- Admin tab -->
             <div id="tab-admin" class="hidden space-y-4">
-              <h2 class="font-semibold text-lg">Admin panel</h2>
+              <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-lg">Admin panel</h2>
+                <span class="text-[10px] px-2 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/40">
+                  Organizer only
+                </span>
+              </div>
               <p class="text-xs text-slate-400">
-                Insert sample World Cup matches into MATCHES table.
+                Insert a couple of sample World Cup matches into <code class="text-[10px] bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">MATCHES</code>.
               </p>
               <button id="admin-sync-matches"
-                      class="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 text-sm font-medium">
+                      class="px-4 py-2.5 rounded-lg bg-fuchsia-500 hover:bg-fuchsia-400 text-sm font-semibold text-slate-950 shadow-md shadow-fuchsia-500/30 transition">
                 Insert sample World Cup matches
               </button>
-              <p id="admin-message" class="text-xs text-slate-400"></p>
+              <p id="admin-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
             </div>
           </section>
         </div>
@@ -203,11 +260,11 @@
         tabButtons.forEach(btn => {
           const t = btn.getAttribute("data-tab");
           if (t === tabName) {
-            btn.classList.remove("bg-slate-900", "border-slate-800");
-            btn.classList.add("bg-slate-800", "border-slate-700");
+            btn.classList.remove("bg-slate-950", "border-slate-800", "text-slate-300");
+            btn.classList.add("bg-slate-800", "border-slate-700", "text-slate-50", "shadow-sm", "shadow-slate-900/60");
           } else {
-            btn.classList.add("bg-slate-900", "border-slate-800");
-            btn.classList.remove("bg-slate-800", "border-slate-700");
+            btn.classList.add("bg-slate-950", "border-slate-800", "text-slate-300");
+            btn.classList.remove("bg-slate-800", "border-slate-700", "text-slate-50", "shadow-sm", "shadow-slate-900/60");
           }
         });
       }
@@ -292,30 +349,48 @@
             .maybeSingle();
           const userPrediction = predData ? predData.prediction : null;
 
+          const statusBadge = m.status === "finished"
+            ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">Final</span>`
+            : `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-600">${m.status || "Scheduled"}</span>`;
+
           html += `
-            <div class="border border-slate-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div>
-                <div class="font-medium">${m.home_team} vs ${m.away_team}</div>
-                <div class="text-xs text-slate-400">
-                  ${m.competition || "World Cup 2026"} • ${m.status || "scheduled"} •
+            <div class="border border-slate-800/80 rounded-2xl bg-slate-950/80 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm shadow-slate-900/70">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <div class="font-semibold text-sm">
+                    ${m.home_team} <span class="text-slate-500 text-[11px]">vs</span> ${m.away_team}
+                  </div>
+                  ${statusBadge}
+                </div>
+                <div class="text-[11px] text-slate-400">
+                  ${m.competition || "World Cup 2026"} •
                   ${m.kickoff_time ? new Date(m.kickoff_time).toLocaleString() : ""}
                 </div>
                 ${m.status === "finished"
-                  ? `<div class="text-xs text-emerald-400 mt-1">Final score: ${m.home_score} - ${m.away_score}</div>`
+                  ? `<div class="text-[11px] text-emerald-400 mt-1">Final score: ${m.home_score} - ${m.away_score}</div>`
                   : ""
                 }
               </div>
               <div class="flex items-center gap-2 text-xs">
                 <button data-match="${m.id}" data-choice="home"
-                        class="predict-btn px-2 py-1 rounded border border-slate-700 ${userPrediction === "home" ? "bg-emerald-600" : "bg-slate-900"}">
+                        class="predict-btn px-3 py-1.5 rounded-full border text-[11px] transition
+                               ${userPrediction === "home"
+                                  ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow shadow-emerald-500/40"
+                                  : "bg-slate-900 border-slate-700 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
                   Home
                 </button>
                 <button data-match="${m.id}" data-choice="draw"
-                        class="predict-btn px-2 py-1 rounded border border-slate-700 ${userPrediction === "draw" ? "bg-emerald-600" : "bg-slate-900"}">
+                        class="predict-btn px-3 py-1.5 rounded-full border text-[11px] transition
+                               ${userPrediction === "draw"
+                                  ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow shadow-emerald-500/40"
+                                  : "bg-slate-900 border-slate-700 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
                   Draw
                 </button>
                 <button data-match="${m.id}" data-choice="away"
-                        class="predict-btn px-2 py-1 rounded border border-slate-700 ${userPrediction === "away" ? "bg-emerald-600" : "bg-slate-900"}">
+                        class="predict-btn px-3 py-1.5 rounded-full border text-[11px] transition
+                               ${userPrediction === "away"
+                                  ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow shadow-emerald-500/40"
+                                  : "bg-slate-900 border-slate-700 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
                   Away
                 </button>
               </div>
@@ -338,7 +413,7 @@
         if (!currentUser) return;
         const { error } = await supabase.from("predictions").upsert({
           user_id: currentUser.id,
-          match_id,
+          match_id: matchId,
           prediction
         });
         if (error) {
@@ -363,13 +438,24 @@
         }
         let html = "";
         data.forEach((row, idx) => {
+          const isTop = idx === 0;
           html += `
-            <div class="flex items-center justify-between border border-slate-800 rounded px-3 py-2">
+            <div class="flex items-center justify-between border rounded-2xl px-3 py-2
+                        ${isTop
+                          ? "border-amber-400/70 bg-amber-500/10 shadow shadow-amber-500/30"
+                          : "border-slate-800 bg-slate-950/80"}">
               <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-500">#${idx + 1}</span>
+                <span class="text-[11px] px-2 py-0.5 rounded-full
+                             ${isTop
+                               ? "bg-amber-500 text-slate-950 font-semibold"
+                               : "bg-slate-800 text-slate-300"}">
+                  #${idx + 1}
+                </span>
                 <span class="text-sm font-medium">${row.name || "Unnamed"}</span>
               </div>
-              <div class="text-xs font-semibold text-emerald-400">${row.points} pts</div>
+              <div class="text-xs font-semibold ${isTop ? "text-amber-300" : "text-emerald-400"}">
+                ${row.points} pts
+              </div>
             </div>
           `;
         });
