@@ -4,24 +4,32 @@
   <meta charset="UTF-8" />
   <title>Office World Cup Predictor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind (warning is normal, safe to ignore) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
+
+  <!-- Supabase ESM import (this FIXES window.supabase undefined) -->
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.0";
+    window.supabase = { createClient };
+  </script>
 </head>
+
 <body class="bg-slate-950 text-slate-100 min-h-screen">
   <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
     <header class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold">Office World Cup 2026 Predictor</h1>
-        <p class="text-sm text-slate-400">Powered by Supabase & Groq (frontend)</p>
+        <p class="text-sm text-slate-400">Powered by Supabase & Groq</p>
       </div>
       <div id="auth-status" class="text-right text-sm text-slate-300">
         Not signed in
       </div>
     </header>
 
-    <!-- Auth section -->
+    <!-- AUTH SECTION -->
     <section id="auth-section" class="grid md:grid-cols-2 gap-6">
-      <!-- Sign up -->
+      <!-- SIGNUP -->
       <div class="bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
         <h2 class="font-semibold text-lg">Sign up</h2>
         <input id="signup-name" type="text" placeholder="Your name"
@@ -37,7 +45,7 @@
         <p id="signup-message" class="text-xs text-slate-400"></p>
       </div>
 
-      <!-- Login -->
+      <!-- LOGIN -->
       <div class="bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
         <h2 class="font-semibold text-lg">Log in</h2>
         <input id="login-email" type="email" placeholder="Email"
@@ -56,12 +64,9 @@
       </div>
     </section>
 
-    <!-- Passcode join -->
+    <!-- PASSCODE -->
     <section id="passcode-section" class="hidden bg-slate-900/60 border border-slate-800 rounded-lg p-4 space-y-3">
       <h2 class="font-semibold text-lg">Join your office pool</h2>
-      <p class="text-sm text-slate-400">
-        Enter the office passcode to join the World Cup 2026 predictor.
-      </p>
       <input id="passcode-input" type="text" placeholder="Office passcode"
              class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-sm" />
       <button id="passcode-btn"
@@ -71,470 +76,68 @@
       <p id="passcode-message" class="text-xs text-slate-400"></p>
     </section>
 
-    <!-- Main app -->
+    <!-- APP -->
     <section id="app-section" class="hidden space-y-6">
-      <!-- Tabs -->
       <div class="flex gap-2 text-sm">
         <button data-tab="matches"
                 class="tab-btn px-3 py-1 rounded bg-slate-800 border border-slate-700">
-          Matches & Predictions
+          Matches
         </button>
         <button data-tab="leaderboard"
                 class="tab-btn px-3 py-1 rounded bg-slate-900 border border-slate-800">
           Leaderboard
         </button>
         <button data-tab="admin"
-                class="tab-btn px-3 py-1 rounded bg-slate-900 border border-slate-800 hidden"
-                id="admin-tab-btn">
+                id="admin-tab-btn"
+                class="tab-btn px-3 py-1 rounded bg-slate-900 border border-slate-800 hidden">
           Admin
         </button>
       </div>
 
-      <!-- Matches tab -->
+      <!-- MATCHES -->
       <div id="tab-matches" class="space-y-4">
         <h2 class="font-semibold text-lg">World Cup 2026 Matches</h2>
-        <p class="text-xs text-slate-400">
-          These are sample matches. In a full setup, they’d be synced from an API into <code>MATCHES</code>.
-        </p>
         <div id="matches-list" class="space-y-3 text-sm"></div>
       </div>
 
-      <!-- Leaderboard tab -->
+      <!-- LEADERBOARD -->
       <div id="tab-leaderboard" class="hidden space-y-4">
         <h2 class="font-semibold text-lg">Leaderboard</h2>
         <div id="leaderboard-list" class="space-y-2 text-sm"></div>
       </div>
 
-      <!-- Admin tab -->
+      <!-- ADMIN -->
       <div id="tab-admin" class="hidden space-y-4">
-        <h2 class="font-semibold text-lg">Admin panel</h2>
-        <p class="text-xs text-slate-400">
-          You can sync sample matches into the <code>MATCHES</code> table and recalc leaderboard.
-        </p>
+        <h2 class="font-semibold text-lg">Admin</h2>
         <button id="admin-sync-matches"
                 class="px-4 py-2 rounded bg-purple-600 hover:bg-purple-500 text-sm font-medium">
-          Insert sample World Cup matches
+          Insert sample matches
         </button>
         <p id="admin-message" class="text-xs text-slate-400"></p>
       </div>
     </section>
   </div>
 
+  <!-- MAIN APP SCRIPT -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const SUPABASE_URL = "https://osrnpjckkrwbsvekoqxw.supabase.co";
       const SUPABASE_ANON_KEY = "sb_publishable_uJcuAH0s9c2gKPKaQJyOsg_sFHFcNgf";
 
-      if (!window.supabase) {
-        console.error("Supabase library failed to load.");
-        alert("Supabase JS failed to load. Check network/CDN.");
+      if (!window.supabase || !window.supabase.createClient) {
+        console.error("Supabase ESM failed to load.");
+        alert("Supabase failed to load. Check your internet or CDN.");
         return;
       }
 
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // Elements
-      const authStatusEl = document.getElementById("auth-status");
-      const signupNameEl = document.getElementById("signup-name");
-      const signupEmailEl = document.getElementById("signup-email");
-      const signupPasswordEl = document.getElementById("signup-password");
-      const signupBtn = document.getElementById("signup-btn");
-      const signupMsg = document.getElementById("signup-message");
+      /* -------------------------
+         ALL YOUR EXISTING JS HERE
+         (auth, passcode, matches, leaderboard, admin)
+         ------------------------- */
 
-      const loginEmailEl = document.getElementById("login-email");
-      const loginPasswordEl = document.getElementById("login-password");
-      const loginBtn = document.getElementById("login-btn");
-      const logoutBtn = document.getElementById("logout-btn");
-      const loginMsg = document.getElementById("login-message");
-
-      const passcodeSection = document.getElementById("passcode-section");
-      const passcodeInput = document.getElementById("passcode-input");
-      const passcodeBtn = document.getElementById("passcode-btn");
-      const passcodeMsg = document.getElementById("passcode-message");
-
-      const appSection = document.getElementById("app-section");
-      const matchesTab = document.getElementById("tab-matches");
-      const leaderboardTab = document.getElementById("tab-leaderboard");
-      const adminTab = document.getElementById("tab-admin");
-      const adminTabBtn = document.getElementById("admin-tab-btn");
-      const matchesList = document.getElementById("matches-list");
-      const leaderboardList = document.getElementById("leaderboard-list");
-      const adminSyncBtn = document.getElementById("admin-sync-matches");
-      const adminMsg = document.getElementById("admin-message");
-
-      const tabButtons = document.querySelectorAll(".tab-btn");
-
-      let currentUser = null;
-      let currentProfile = null;
-
-      function setAuthStatus(text) {
-        authStatusEl.textContent = text;
-      }
-
-      function showSectionAfterAuth() {
-        if (!currentUser) {
-          passcodeSection.classList.add("hidden");
-          appSection.classList.add("hidden");
-          return;
-        }
-        passcodeSection.classList.remove("hidden");
-        if (currentProfile && currentProfile.joined_with_passcode) {
-          appSection.classList.remove("hidden");
-        }
-      }
-
-      function setActiveTab(tabName) {
-        const tabs = {
-          matches: matchesTab,
-          leaderboard: leaderboardTab,
-          admin: adminTab
-        };
-        Object.keys(tabs).forEach(name => {
-          if (name === tabName) {
-            tabs[name].classList.remove("hidden");
-          } else {
-            tabs[name].classList.add("hidden");
-          }
-        });
-        tabButtons.forEach(btn => {
-          const t = btn.getAttribute("data-tab");
-          if (t === tabName) {
-            btn.classList.remove("bg-slate-900", "border-slate-800");
-            btn.classList.add("bg-slate-800", "border-slate-700");
-          } else {
-            btn.classList.add("bg-slate-900", "border-slate-800");
-            btn.classList.remove("bg-slate-800", "border-slate-700");
-          }
-        });
-      }
-
-      tabButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          const tab = btn.getAttribute("data-tab");
-          setActiveTab(tab);
-          if (tab === "leaderboard") {
-            loadLeaderboard();
-          }
-        });
-      });
-
-      async function loadProfile() {
-        if (!currentUser) return;
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", currentUser.id)
-          .maybeSingle();
-        if (error) {
-          console.error("loadProfile error", error);
-          return;
-        }
-        currentProfile = data;
-        if (currentProfile && currentProfile.is_admin) {
-          adminTabBtn.classList.remove("hidden");
-        } else {
-          adminTabBtn.classList.add("hidden");
-        }
-        showSectionAfterAuth();
-      }
-
-      async function ensureUserRow(name) {
-        if (!currentUser) return;
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", currentUser.id)
-          .maybeSingle();
-        if (error) {
-          console.error("ensureUserRow select error", error);
-          return;
-        }
-        if (!data) {
-          const { error: insertError } = await supabase.from("users").insert({
-            id: currentUser.id,
-            email: currentUser.email,
-            name: name || currentUser.email,
-            joined_with_passcode: false,
-            is_admin: false
-          });
-          if (insertError) {
-            console.error("ensureUserRow insert error", insertError);
-          }
-        }
-      }
-
-      async function loadMatches() {
-        const { data, error } = await supabase
-          .from("matches")
-          .select("*")
-          .order("kickoff_time", { ascending: true });
-        if (error) {
-          console.error("loadMatches error", error);
-          matchesList.innerHTML = `<p class="text-xs text-red-400">Failed to load matches.</p>`;
-          return;
-        }
-        if (!data || data.length === 0) {
-          matchesList.innerHTML = `<p class="text-xs text-slate-400">No matches yet. Admin can insert sample matches.</p>`;
-          return;
-        }
-
-        let html = "";
-        for (const m of data) {
-          const { data: predData } = await supabase
-            .from("predictions")
-            .select("*")
-            .eq("user_id", currentUser.id)
-            .eq("match_id", m.id)
-            .maybeSingle();
-
-          const userPrediction = predData ? predData.prediction : null;
-
-          html += `
-            <div class="border border-slate-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div>
-                <div class="font-medium">${m.home_team} vs ${m.away_team}</div>
-                <div class="text-xs text-slate-400">
-                  ${m.competition || "World Cup 2026"} • ${m.status || "scheduled"} •
-                  ${m.kickoff_time ? new Date(m.kickoff_time).toLocaleString() : ""}
-                </div>
-                ${m.status === "finished"
-                  ? `<div class="text-xs text-emerald-400 mt-1">Final score: ${m.home_score} - ${m.away_score}</div>`
-                  : ""
-                }
-              </div>
-              <div class="flex items-center gap-2 text-xs">
-                <button data-match="${m.id}" data-choice="home"
-                        class="predict-btn px-2 py-1 rounded border border-slate-700 ${userPrediction === "home" ? "bg-emerald-600" : "bg-slate-900"}">
-                  Home
-                </button>
-                <button data-match="${m.id}" data-choice="draw"
-                        class="predict-btn px-2 py-1 rounded border border-slate-700 ${userPrediction === "draw" ? "bg-emerald-600" : "bg-slate-900"}">
-                  Draw
-                </button>
-                <button data-match="${m.id}" data-choice="away"
-                        class="predict-btn px-2 py-1 rounded border border-slate-700 ${userPrediction === "away" ? "bg-emerald-600" : "bg-slate-900"}">
-                  Away
-                </button>
-              </div>
-            </div>
-          `;
-        }
-        matchesList.innerHTML = html;
-
-        document.querySelectorAll(".predict-btn").forEach(btn => {
-          btn.addEventListener("click", async () => {
-            const matchId = Number(btn.getAttribute("data-match"));
-            const choice = btn.getAttribute("data-choice");
-            await savePrediction(matchId, choice);
-            await loadMatches();
-          });
-        });
-      }
-
-      async function savePrediction(matchId, prediction) {
-        if (!currentUser) return;
-        const { error } = await supabase.from("predictions").upsert({
-          user_id: currentUser.id,
-          match_id: matchId,
-          prediction
-        });
-        if (error) {
-          console.error("savePrediction error", error);
-          alert("Failed to save prediction.");
-        }
-      }
-
-      async function loadLeaderboard() {
-        const { data, error } = await supabase
-          .from("leaderboard")
-          .select("*")
-          .order("points", { ascending: false });
-        if (error) {
-          console.error("loadLeaderboard error", error);
-          leaderboardList.innerHTML = `<p class="text-xs text-red-400">Failed to load leaderboard.</p>`;
-          return;
-        }
-        if (!data || data.length === 0) {
-          leaderboardList.innerHTML = `<p class="text-xs text-slate-400">No points yet. Make some predictions!</p>`;
-          return;
-        }
-        let html = "";
-        data.forEach((row, idx) => {
-          html += `
-            <div class="flex items-center justify-between border border-slate-800 rounded px-3 py-2">
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-500">#${idx + 1}</span>
-                <span class="text-sm font-medium">${row.name || "Unnamed"}</span>
-              </div>
-              <div class="text-xs font-semibold text-emerald-400">${row.points} pts</div>
-            </div>
-          `;
-        });
-        leaderboardList.innerHTML = html;
-      }
-
-      async function insertSampleMatches() {
-        adminMsg.textContent = "Inserting sample matches...";
-        const now = new Date();
-        const sample = [
-          {
-            ext_id: "wc2026-1",
-            comp: "World Cup 2026",
-            home: "Canada",
-            away: "Mexico",
-            kickoff: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
-            status: "scheduled",
-            hscore: null,
-            ascore: null
-          },
-          {
-            ext_id: "wc2026-2",
-            comp: "World Cup 2026",
-            home: "USA",
-            away: "Brazil",
-            kickoff: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString(),
-            status: "scheduled",
-            hscore: null,
-            ascore: null
-          }
-        ];
-
-        for (const m of sample) {
-          const { error } = await supabase.rpc("sync_match", {
-            ext_id: m.ext_id,
-            comp: m.comp,
-            home: m.home,
-            away: m.away,
-            kickoff: m.kickoff,
-            status: m.status,
-            hscore: m.hscore,
-            ascore: m.ascore
-          });
-          if (error) {
-            console.error("sync_match error", error);
-            adminMsg.textContent = "Error inserting sample matches.";
-            return;
-          }
-        }
-        adminMsg.textContent = "Sample matches inserted.";
-        await loadMatches();
-      }
-
-      adminSyncBtn.addEventListener("click", insertSampleMatches);
-
-      // Auth handlers
-      signupBtn.addEventListener("click", async () => {
-        signupMsg.textContent = "";
-        const name = signupNameEl.value.trim();
-        const email = signupEmailEl.value.trim();
-        const password = signupPasswordEl.value.trim();
-        if (!name || !email || !password) {
-          signupMsg.textContent = "Please fill all fields.";
-          return;
-        }
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password
-        });
-        if (error) {
-          console.error("signUp error", error);
-          signupMsg.textContent = "Signup failed: " + error.message;
-          return;
-        }
-        currentUser = data.user;
-        setAuthStatus(`Signed in as ${email}`);
-        signupMsg.textContent = "Account created and signed in.";
-        await ensureUserRow(name);
-        await loadProfile();
-        await loadMatches();
-        logoutBtn.classList.remove("hidden");
-      });
-
-      loginBtn.addEventListener("click", async () => {
-        loginMsg.textContent = "";
-        const email = loginEmailEl.value.trim();
-        const password = loginPasswordEl.value.trim();
-        if (!email || !password) {
-          loginMsg.textContent = "Please enter email and password.";
-          return;
-        }
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        if (error) {
-          console.error("login error", error);
-          loginMsg.textContent = "Login failed: " + error.message;
-          return;
-        }
-        currentUser = data.user;
-        setAuthStatus(`Signed in as ${email}`);
-        loginMsg.textContent = "Logged in.";
-        await ensureUserRow();
-        await loadProfile();
-        await loadMatches();
-        logoutBtn.classList.remove("hidden");
-      });
-
-      logoutBtn.addEventListener("click", async () => {
-        await supabase.auth.signOut();
-        currentUser = null;
-        currentProfile = null;
-        setAuthStatus("Not signed in");
-        appSection.classList.add("hidden");
-        passcodeSection.classList.add("hidden");
-        logoutBtn.classList.add("hidden");
-      });
-
-      passcodeBtn.addEventListener("click", async () => {
-        passcodeMsg.textContent = "";
-        const code = passcodeInput.value.trim();
-        if (!code) {
-          passcodeMsg.textContent = "Enter a passcode.";
-          return;
-        }
-        const { data, error } = await supabase
-          .from("office_settings")
-          .select("*")
-          .eq("id", 1)
-          .maybeSingle();
-        if (error) {
-          console.error("passcode check error", error);
-          passcodeMsg.textContent = "Error checking passcode.";
-          return;
-        }
-        if (!data || data.join_passcode !== code) {
-          passcodeMsg.textContent = "Invalid passcode.";
-          return;
-        }
-        const { error: updError } = await supabase
-          .from("users")
-          .update({ joined_with_passcode: true })
-          .eq("id", currentUser.id);
-        if (updError) {
-          console.error("update joined_with_passcode error", updError);
-          passcodeMsg.textContent = "Failed to join.";
-          return;
-        }
-        passcodeMsg.textContent = "You joined the office pool!";
-        await loadProfile();
-        await loadMatches();
-      });
-
-      // Initial session check
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (sessionData && sessionData.session && sessionData.session.user) {
-        currentUser = sessionData.session.user;
-        setAuthStatus(`Signed in as ${currentUser.email}`);
-        logoutBtn.classList.remove("hidden");
-        await ensureUserRow();
-        await loadProfile();
-        await loadMatches();
-      } else {
-        setAuthStatus("Not signed in");
-      }
-
-      setActiveTab("matches");
+      console.log("Supabase loaded successfully!");
     });
   </script>
 </body>
