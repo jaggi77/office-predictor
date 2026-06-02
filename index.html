@@ -5,7 +5,7 @@
   <title>Office World Cup 2026 Predictor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind (warning is safe to ignore) -->
+  <!-- Tailwind (CDN; warning about production is safe to ignore for now) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Load Supabase FIRST via ESM, then signal ready -->
@@ -14,9 +14,54 @@
     window.supabase = { createClient };
     window.dispatchEvent(new Event("supabase-ready"));
   </script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #020617 60%, #000 100%);
+    }
+    .cf-panel {
+      background:
+        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(45, 212, 191, 0.12), transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(15, 23, 42, 0.9), #020617 70%);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow:
+        0 18px 45px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(18px);
+    }
+    .cf-card {
+      background:
+        radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(45, 212, 191, 0.18), transparent 55%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow:
+        0 16px 40px rgba(15, 23, 42, 0.95),
+        0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+    .cf-soft {
+      transition: all 180ms ease-out;
+    }
+    .cf-soft:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.95),
+        0 0 0 1px rgba(45, 212, 191, 0.25);
+      border-color: rgba(45, 212, 191, 0.5);
+    }
+    .cf-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: radial-gradient(circle at 0 0, rgba(148, 163, 184, 0.25), transparent 55%),
+                  rgba(15, 23, 42, 0.95);
+    }
+  </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body class="text-slate-100 min-h-screen">
   <div id="app-root" class="max-w-6xl mx-auto px-4 py-6">
     <h1 class="text-xl font-bold text-center">Loading app…</h1>
   </div>
@@ -36,28 +81,28 @@
           <!-- HEADER -->
           <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div class="space-y-1">
-              <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+              <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-cyan-300 to-slate-100 bg-clip-text text-transparent">
                 Office World Cup 2026 Predictor
               </h1>
               <p class="text-sm text-slate-400">
-                Friendly competition, live scores, and bragging rights — all powered by Supabase.
+                Carbon‑fiber elite dashboard for your office World Cup pool.
               </p>
             </div>
-            <div class="flex flex-col items-end gap-1">
-              <div id="auth-status" class="text-sm text-slate-200">
+            <div class="flex flex-col items-end gap-2">
+              <div id="auth-status" class="text-sm text-slate-100">
                 Not signed in
               </div>
-              <span class="inline-flex items-center gap-1 rounded-full bg-slate-900/70 border border-slate-700 px-3 py-1 text-[11px] uppercase tracking-wide text-slate-400">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <div class="cf-pill px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Live Office Pool
-              </span>
+              </div>
             </div>
           </header>
 
           <!-- AUTH SECTION -->
           <section id="auth-section" class="grid md:grid-cols-2 gap-6">
             <!-- Sign up -->
-            <div class="bg-gradient-to-br from-slate-900/80 to-slate-950/90 border border-slate-800/80 rounded-2xl p-5 shadow-lg shadow-emerald-500/5 space-y-3">
+            <div class="cf-panel p-5 space-y-4 cf-soft">
               <div class="flex items-center justify-between">
                 <h2 class="font-semibold text-lg">Create your account</h2>
                 <span class="text-[10px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">
@@ -79,14 +124,14 @@
                       class="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-sm font-semibold text-slate-950 shadow-md shadow-emerald-500/30 transition">
                 Create account & sign in
               </button>
-              <p id="signup-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
+              <p id="signup-message" class="text-xs text-slate-300 min-h-[1rem]"></p>
             </div>
 
             <!-- Login -->
-            <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-5 shadow-lg shadow-slate-900/60 space-y-3">
+            <div class="cf-panel p-5 space-y-4 cf-soft">
               <div class="flex items-center justify-between">
                 <h2 class="font-semibold text-lg">Welcome back</h2>
-                <span class="text-[10px] px-2 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-600">
+                <span class="text-[10px] px-2 py-1 rounded-full bg-slate-900/80 text-slate-200 border border-slate-500/70">
                   Existing player
                 </span>
               </div>
@@ -105,16 +150,16 @@
                   Log in
                 </button>
                 <button id="logout-btn"
-                        class="w-full py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm font-semibold text-slate-100 hidden">
+                        class="w-full py-2.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-sm font-semibold text-slate-100 hidden">
                   Log out
                 </button>
               </div>
-              <p id="login-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
+              <p id="login-message" class="text-xs text-slate-300 min-h-[1rem]"></p>
             </div>
           </section>
 
           <!-- PASSCODE -->
-          <section id="passcode-section" class="hidden bg-slate-950/90 border border-slate-800 rounded-2xl p-5 shadow-inner shadow-slate-900/80 space-y-3">
+          <section id="passcode-section" class="hidden cf-panel p-5 space-y-3 cf-soft">
             <div class="flex items-center justify-between">
               <div>
                 <h2 class="font-semibold text-lg">Join your office pool</h2>
@@ -134,7 +179,7 @@
                 Join with passcode
               </button>
             </div>
-            <p id="passcode-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
+            <p id="passcode-message" class="text-xs text-slate-300 min-h-[1rem]"></p>
           </section>
 
           <!-- MAIN APP -->
@@ -142,7 +187,7 @@
             <!-- Tabs -->
             <div class="flex flex-wrap gap-2 text-sm">
               <button data-tab="matches"
-                      class="tab-btn px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-slate-50 shadow-sm shadow-slate-900/60">
+                      class="tab-btn px-4 py-2 rounded-full bg-slate-900/90 border border-slate-600 text-slate-50 shadow-sm shadow-slate-900/60">
                 Matches & Predictions
               </button>
               <button data-tab="leaderboard"
@@ -164,7 +209,7 @@
                   World Cup 2026 Matches
                 </h2>
                 <p class="text-[11px] text-slate-400">
-                  Click Home / Draw / Away to lock in your prediction.
+                  Tap Home / Draw / Away to lock in your prediction.
                 </p>
               </div>
               <div id="matches-list" class="space-y-3 text-sm"></div>
@@ -190,13 +235,14 @@
                 </span>
               </div>
               <p class="text-xs text-slate-400">
-                Insert a couple of sample World Cup matches into <code class="text-[10px] bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">MATCHES</code>.
+                Insert a couple of sample World Cup matches into
+                <code class="text-[10px] bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">matches</code>.
               </p>
               <button id="admin-sync-matches"
                       class="px-4 py-2.5 rounded-lg bg-fuchsia-500 hover:bg-fuchsia-400 text-sm font-semibold text-slate-950 shadow-md shadow-fuchsia-500/30 transition">
                 Insert sample World Cup matches
               </button>
-              <p id="admin-message" class="text-xs text-slate-400 min-h-[1rem]"></p>
+              <p id="admin-message" class="text-xs text-slate-300 min-h-[1rem]"></p>
             </div>
           </section>
         </div>
@@ -261,10 +307,10 @@
           const t = btn.getAttribute("data-tab");
           if (t === tabName) {
             btn.classList.remove("bg-slate-950", "border-slate-800", "text-slate-300");
-            btn.classList.add("bg-slate-800", "border-slate-700", "text-slate-50", "shadow-sm", "shadow-slate-900/60");
+            btn.classList.add("bg-slate-900/90", "border-slate-600", "text-slate-50", "shadow-sm", "shadow-slate-900/60");
           } else {
             btn.classList.add("bg-slate-950", "border-slate-800", "text-slate-300");
-            btn.classList.remove("bg-slate-800", "border-slate-700", "text-slate-50", "shadow-sm", "shadow-slate-900/60");
+            btn.classList.remove("bg-slate-900/90", "border-slate-600", "text-slate-50", "shadow-sm", "shadow-slate-900/60");
           }
         });
       }
@@ -351,14 +397,16 @@
 
           const statusBadge = m.status === "finished"
             ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/40">Final</span>`
-            : `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-600">${m.status || "Scheduled"}</span>`;
+            : `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900/80 text-slate-200 border border-slate-600">${m.status || "Scheduled"}</span>`;
 
           html += `
-            <div class="border border-slate-800/80 rounded-2xl bg-slate-950/80 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm shadow-slate-900/70">
+            <div class="cf-card p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 cf-soft">
               <div class="space-y-1">
                 <div class="flex items-center gap-2">
                   <div class="font-semibold text-sm">
-                    ${m.home_team} <span class="text-slate-500 text-[11px]">vs</span> ${m.away_team}
+                    ${m.home_team}
+                    <span class="text-slate-500 text-[11px]">vs</span>
+                    ${m.away_team}
                   </div>
                   ${statusBadge}
                 </div>
@@ -376,21 +424,21 @@
                         class="predict-btn px-3 py-1.5 rounded-full border text-[11px] transition
                                ${userPrediction === "home"
                                   ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow shadow-emerald-500/40"
-                                  : "bg-slate-900 border-slate-700 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
+                                  : "bg-slate-950/80 border-slate-600 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
                   Home
                 </button>
                 <button data-match="${m.id}" data-choice="draw"
                         class="predict-btn px-3 py-1.5 rounded-full border text-[11px] transition
                                ${userPrediction === "draw"
                                   ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow shadow-emerald-500/40"
-                                  : "bg-slate-900 border-slate-700 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
+                                  : "bg-slate-950/80 border-slate-600 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
                   Draw
                 </button>
                 <button data-match="${m.id}" data-choice="away"
                         class="predict-btn px-3 py-1.5 rounded-full border text-[11px] transition
                                ${userPrediction === "away"
                                   ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow shadow-emerald-500/40"
-                                  : "bg-slate-900 border-slate-700 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
+                                  : "bg-slate-950/80 border-slate-600 hover:border-emerald-400/70 hover:bg-slate-900/80"}">
                   Away
                 </button>
               </div>
@@ -440,15 +488,12 @@
         data.forEach((row, idx) => {
           const isTop = idx === 0;
           html += `
-            <div class="flex items-center justify-between border rounded-2xl px-3 py-2
-                        ${isTop
-                          ? "border-amber-400/70 bg-amber-500/10 shadow shadow-amber-500/30"
-                          : "border-slate-800 bg-slate-950/80"}">
+            <div class="cf-card px-3 py-2 flex items-center justify-between ${isTop ? "border-amber-400/70 shadow shadow-amber-500/30" : ""}">
               <div class="flex items-center gap-2">
                 <span class="text-[11px] px-2 py-0.5 rounded-full
                              ${isTop
                                ? "bg-amber-500 text-slate-950 font-semibold"
-                               : "bg-slate-800 text-slate-300"}">
+                               : "bg-slate-900/90 text-slate-200 border border-slate-600"}">
                   #${idx + 1}
                 </span>
                 <span class="text-sm font-medium">${row.name || "Unnamed"}</span>
